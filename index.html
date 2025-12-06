@@ -835,25 +835,22 @@
       createTripCard(data);
 
       // 2. 將資料送到 Google Sheet（Apps Script）
-      //    若尚未設定 GOOGLE_APPS_SCRIPT_URL，這段會因 404 等錯誤而失敗，可暫時忽略。
+      //    這裡改成 no-cors，避免 CORS 預檢被擋
       try {
-        // TODO: 替換 GOOGLE_APPS_SCRIPT_URL 後即可開始測試串接
-        const resp = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+        await fetch(GOOGLE_APPS_SCRIPT_URL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          mode: 'no-cors',
+          // 不加 headers，讓瀏覽器送預設 Content-Type（避免 preflight）
           body: JSON.stringify(data)
         });
 
-        if (!resp.ok) {
-          throw new Error('Network response was not ok');
-        }
-        showToast('✅ 已記錄到航海總帳（Google Sheet）！');
+        // no-cors 模式下沒辦法檢查 resp.ok，但通常 request 會送出去
+        showToast('✅ 已嘗試寫入航海總帳（Google Sheet）！請到試算表確認是否有新增一列。');
       } catch (err) {
-        console.warn('寫入 Google Sheet 失敗（可以先略過）：', err);
-        showToast('⚠️ 寫入 Google Sheet 失敗（請稍後設定 Apps Script URL）');
+        console.warn('寫入 Google Sheet 失敗（網路或 URL 問題）：', err);
+        showToast('⚠️ 寫入 Google Sheet 失敗（請檢查 Apps Script URL & 權限設定）');
       }
+
 
       tripForm.reset();
     });
