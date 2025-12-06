@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>航海旅遊冒險日誌｜Travel Logbook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 手機主畫面 icon（TODO: 換成你自己的海賊風圖示） -->
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- TODO: manifest.json 範例（請建立同名檔案）
+  {
+    "name": "航海旅遊冒險日誌",
+    "short_name": "航海日誌",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#f4e3c3",
+    "theme_color": "#283d4a",
+    "icons": [
+      {
+        "src": "icon-192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  -->
+
+  <style>
+    :root {
+      --bg-paper: #f4e3c3;
+      --bg-paper-dark: #e0cda5;
+      --ink-dark: #2b2420;
+      --ink-muted: #5e4b3c;
+      --accent-blue: #284965;
+      --accent-red: #b93b3b;
+      --card-border: #20140d;
+      --shadow-soft: 0 4px 10px rgba(0,0,0,0.18);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
+      background: radial-gradient(circle at top, #f9f0dd 0, #f4e3c3 40%, #e3cfaa 100%);
+      color: var(--ink-dark);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 1.5rem 1.2rem 0.5rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(244,227,195,0.96), rgba(244,227,195,0.82), transparent);
+      border-bottom: 2px solid rgba(0,0,0,0.06);
+    }
+
+    .logo-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .logo-title span:first-child {
+      font-size: 1.3rem;
+    }
+
+    .sub-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--ink-muted);
+    }
+
+    .header-actions {
+      margin-top: 0.75rem;
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border-radius: 999px;
+      border: 2px solid var(--card-border);
+      background: #fdf7e9;
+      padding: 0.45rem 1.1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.18);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.1s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+      background: #fff8ee;
+    }
+
+    button:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+    }
+
+    button.primary {
+      background: #ffe7b8;
+      border-color: var(--accent-red);
+    }
+
+    main {
+      padding: 1rem 1.2rem 2.4rem;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    section {
+      margin-bottom: 1.6rem;
+    }
+
+    .section-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.25rem 0.8rem;
+      border-radius: 999px;
+      border: 2px solid var(--card-border);
+      background: linear-gradient(135deg, #ffefc8, #f6deb2);
+      box-shadow: 2px 3px 0 rgba(0,0,0,0.25);
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-title .badge-en {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--accent-blue);
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 800px) {
+      .layout-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      border-radius: var(--radius);
+      border: 2px solid var(--card-border);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.5), rgba(255,255,255,0.2)),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.03), rgba(0,0,0,0.03) 1px, transparent 1px, transparent 4px);
+      box-shadow: var(--shadow-soft);
+      padding: 0.9rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: var(--radius);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-sub {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0.6rem 0.8rem;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.18rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    textarea,
+    select {
+      border-radius: 6px;
+      border: 1.5px solid rgba(0,0,0,0.35);
+      padding: 0.35rem 0.45rem;
+      font-size: 0.85rem;
+      background: rgba(255,252,245,0.95);
+      outline: none;
+      transition: border 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px rgba(40,73,101,0.35);
+      background: #fffdf7;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    .hint {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    /* 冒險卡片列表 / Travel log cards */
+    .trip-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 0.9rem;
+    }
+
+    .trip-card {
+      border-radius: var(--radius);
+      border: 2px solid var(--card-border);
+      background: #fdf4dd;
+      padding: 0.7rem 0.8rem 0.8rem;
+      position: relative;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      cursor: pointer;
+    }
+
+    .trip-card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.4rem;
+      align-items: baseline;
+    }
+
+    .trip-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .trip-location {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+
+    .trip-date {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+    }
+
+    .trip-tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-top: 0.25rem;
+    }
+
+    .pill {
+      padding: 0.05rem 0.35rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.5);
+      font-size: 0.7rem;
+      background: rgba(255,255,255,0.5);
+    }
+
+    .stars {
+      font-size: 0.8rem;
+      color: #f0a400;
+    }
+
+    .trip-snippet {
+      font-size: 0.78rem;
+      max-height: 3.2em;
+      overflow: hidden;
+    }
+
+    .trip-weather {
+      font-size: 0.78rem;
+    }
+
+    /* 行程規劃區 */
+    .planner-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .planner-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .plan-version-list {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .version-pill {
+      padding: 0.12rem 0.6rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--card-border);
+      font-size: 0.75rem;
+      cursor: pointer;
+      background: #fff6e2;
+    }
+
+    .version-pill.active {
+      background: #ffd9a1;
+      border-color: var(--accent-blue);
+    }
+
+    .days-column {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 0.4rem;
+    }
+
+    .day-card {
+      border-radius: var(--radius);
+      border: 2px solid var(--card-border);
+      padding: 0.45rem 0.5rem;
+      background: #fff7e7;
+    }
+
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .plan-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.32rem;
+      margin-top: 0.4rem;
+      min-height: 1.6rem;
+    }
+
+    .plan-item {
+      padding: 0.12rem 0.45rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--card-border);
+      background: #ffeac2;
+      font-size: 0.75rem;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .plan-item.dragging {
+      opacity: 0.6;
+      cursor: grabbing;
+    }
+
+    .plan-items.drag-over {
+      outline: 2px dashed rgba(0,0,0,0.4);
+      outline-offset: 2px;
+    }
+
+    .ai-panel {
+      border-radius: var(--radius);
+      border: 2px dashed var(--card-border);
+      padding: 0.6rem 0.7rem;
+      background: rgba(255,255,255,0.5);
+      font-size: 0.8rem;
+    }
+
+    /* 冒險書預覽 */
+    .preview-page {
+      border-radius: 10px;
+      border: 2px solid var(--card-border);
+      background: var(--bg-paper-dark);
+      padding: 0.7rem;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.23);
+      max-width: 480px;
+      margin: 0 auto;
+      font-size: 0.8rem;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+      font-weight: 700;
+    }
+
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    .preview-table th,
+    .preview-table td {
+      padding: 0.2rem 0.25rem;
+      border-bottom: 1px solid rgba(0,0,0,0.35);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem 0 1.4rem;
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fffbf0;
+      border: 2px solid var(--card-border);
+      border-radius: 999px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.8rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.22);
+      display: none;
+      z-index: 99;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-title">
+      <span>航海旅遊冒險日誌</span>
+      <span class="sub-title">TRAVEL LOGBOOK & TRIP PLANNER</span>
+    </div>
+    <div class="header-actions">
+      <button class="primary" id="btnScrollToForm">⚓ 開始新的冒險</button>
+      <button id="btnLoadFromSheet">📜 從航海總帳載入紀錄（Sheet）</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- 新增旅程紀錄區 / Travel Log Form -->
+    <section id="trip-form-section">
+      <div class="section-title">
+        ✍️ 旅程紀錄表單
+        <span class="badge-en">NEW TRIP ENTRY</span>
+      </div>
+      <div class="layout-grid">
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>新增冒險紀錄</span>
+              <span class="card-sub">像草帽一樣，把每次出航都記下來。</span>
+            </div>
+          </div>
+          <form id="tripForm">
+            <div class="form-grid">
+              <label>
+                旅程名稱 / Title
+                <input type="text" name="title" placeholder="例：阿拉巴斯坦沙漠之旅" required>
+              </label>
+              <label>
+                地點 / Location
+                <input type="text" name="location" placeholder="城市、國家或海域名稱" required>
+              </label>
+              <label>
+                出發日期 / Start
+                <input type="date" name="startDate" required>
+              </label>
+              <label>
+                結束日期 / End
+                <input type="date" name="endDate" required>
+              </label>
+              <label>
+                特產・美食 / Specialty & Food
+                <input type="text" name="food" placeholder="章魚燒、海鮮丼、當地甜點…">
+              </label>
+              <label>
+                花費（大約）/ Cost
+                <input type="number" name="cost" min="0" step="1" placeholder="例如 15000">
+              </label>
+              <label>
+                天氣 / Weather
+                <select name="weather">
+                  <option value="">選擇天氣</option>
+                  <option>☀️ 晴</option>
+                  <option>⛅ 多雲</option>
+                  <option>🌧 雨</option>
+                  <option>🌫 霧</option>
+                  <option>❄️ 雪</option>
+                </select>
+              </label>
+              <label>
+                照片連結 / Photo URL
+                <input type="text" name="photoUrl" placeholder="https://...（可先留白）">
+              </label>
+              <label>
+                推薦星級 / Rating
+                <select name="rating">
+                  <option value="">-- 選擇 --</option>
+                  <option value="1">★☆☆☆☆</option>
+                  <option value="2">★★☆☆☆</option>
+                  <option value="3">★★★☆☆</option>
+                  <option value="4">★★★★☆</option>
+                  <option value="5">★★★★★</option>
+                </select>
+              </label>
+            </div>
+            <label style="margin-top:0.5rem;">
+              心得紀錄 / Notes
+              <textarea name="notes" placeholder="今天的海風、旅伴、驚喜，都寫進航海日誌裡吧。" required></textarea>
+            </label>
+            <div class="hint">
+              ✅ 送出後：會在下方生成一張「冒險任務卡」，同時呼叫 Google Sheet 寫入（需要你之後補上 Apps Script URL）。
+            </div>
+            <div class="card-footer">
+              <button type="reset">🧽 清除</button>
+              <button type="submit" class="primary">📌 記錄這次出航</button>
+            </div>
+          </form>
+        </article>
+
+        <!-- 旅遊紀錄列表預覽 -->
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>最近的冒險紀錄</span>
+              <span class="card-sub">TRAVEL LOG CARDS</span>
+            </div>
+          </div>
+          <div id="tripList" class="trip-list">
+            <!-- JS 會在這裡插入 trip-card -->
+          </div>
+          <div class="hint">
+            💡 提示：點卡片可以在未來擴充成「詳情彈窗」。目前為簡化展示版本。
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 行程規劃區 / Trip Planner -->
+    <section>
+      <div class="section-title">
+        🧭 行程規劃器
+        <span class="badge-en">TRIP PLANNER</span>
+      </div>
+      <div class="planner-layout">
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>行程版本</span>
+              <span class="card-sub">Version A / B…</span>
+            </div>
+            <button id="btnAiPlan" class="primary">✨ 生成建議行程（假資料）</button>
+          </div>
+          <div class="plan-version-list">
+            <div class="version-pill active" data-version="A">A 案｜家庭冒險</div>
+            <div class="version-pill" data-version="B">B 案｜美食特攻</div>
+          </div>
+          <div class="days-column" id="daysColumn">
+            <!-- JS 產生 Day 卡片 -->
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>AI 建議區（假資料示意）</span>
+              <span class="card-sub">AI SUGGESTIONS MOCK</span>
+            </div>
+          </div>
+          <div class="ai-panel" id="aiPanel">
+            點擊左側「✨ 生成建議行程」按鈕，我會用內建假資料幫你填入 3 天行程，並可拖拉排序。<br>
+            <br>
+            <!-- TODO: 未來在這裡串接真實 AI API（例如：根據地點與天數產生行程） -->
+          </div>
+          <div style="margin-top:0.7rem;">
+            <div class="section-title" style="margin-bottom:0.35rem;">
+              📖 航海冒險書預覽
+              <span class="badge-en">ADVENTURE BOOK</span>
+            </div>
+            <div class="preview-page" id="previewPage">
+              <div class="preview-header">
+                <div>行程標題｜Sample Trip</div>
+                <div>Day 1–3</div>
+              </div>
+              <table class="preview-table">
+                <thead>
+                  <tr>
+                    <th>Day</th>
+                    <th>重點行程</th>
+                    <th>備註</th>
+                  </tr>
+                </thead>
+                <tbody id="previewTableBody">
+                  <!-- JS 依照 planner 自動更新摘要 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    🏴‍☠️ 航海旅遊冒險日誌｜前端骨架示意版（含 Google Sheet & AI 預留串接點）<br>
+    <!-- TODO: 未來可加入 Service Worker 提供離線快取與更完整 PWA 體驗 -->
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ================================
+    // 全域常數與假資料
+    // ================================
+
+    // TODO: 將此 URL 換成你部署好的 Google Apps Script Web App URL
+    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmOnE6XsXt7MVTZPd4F-Adc34PQoIlVPOd4gsFGIP5xKgNW1j2_4_YgwhePGpTa2M0/exec';
+
+    // 簡單的假行程資料（模擬 AI 回傳）
+    const MOCK_AI_PLAN = {
+      days: [
+        {
+          day: 1,
+          label: "Day 1",
+          items: ["抵達城市・check-in", "老街散步", "海邊日落", "當地居酒屋晚餐"]
+        },
+        {
+          day: 2,
+          label: "Day 2",
+          items: ["特色早餐", "代表性景點 A", "咖啡小憩", "夜市大吃特吃"]
+        },
+        {
+          day: 3,
+          label: "Day 3",
+          items: ["早午餐", "紀念品採買", "公園放空", "返回港口 / 機場"]
+        }
+      ]
+    };
+
+    // ================================
+    // DOM 參照
+    // ================================
+    const tripForm = document.getElementById('tripForm');
+    const tripListEl = document.getElementById('tripList');
+    const btnScrollToForm = document.getElementById('btnScrollToForm');
+    const btnLoadFromSheet = document.getElementById('btnLoadFromSheet');
+    const btnAiPlan = document.getElementById('btnAiPlan');
+    const daysColumn = document.getElementById('daysColumn');
+    const previewTableBody = document.getElementById('previewTableBody');
+    const toastEl = document.getElementById('toast');
+
+    // ================================
+    // 小工具：Toast 訊息
+    // ================================
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.style.display = 'block';
+      setTimeout(() => {
+        toastEl.style.display = 'none';
+      }, 2600);
+    }
+
+    // ================================
+    // 捲動到表單
+    // ================================
+    btnScrollToForm.addEventListener('click', () => {
+      document.getElementById('trip-form-section').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // ================================
+    // 旅程卡片生成
+    // ================================
+    function createTripCard(data) {
+      const card = document.createElement('div');
+      card.className = 'trip-card';
+
+      const header = document.createElement('div');
+      header.className = 'trip-card-header';
+
+      const titleBox = document.createElement('div');
+      titleBox.innerHTML = `
+        <div class="trip-name">${data.title || '(未命名冒險)'}</div>
+        <div class="trip-location">${data.location || ''}</div>
+      `;
+
+      const metaBox = document.createElement('div');
+      metaBox.style.textAlign = 'right';
+      metaBox.innerHTML = `
+        <div class="trip-date">${data.startDate || ''} ～ ${data.endDate || ''}</div>
+        <div class="stars">${renderStars(data.rating)}</div>
+      `;
+
+      header.appendChild(titleBox);
+      header.appendChild(metaBox);
+
+      const snippet = document.createElement('div');
+      snippet.className = 'trip-snippet';
+      snippet.textContent = data.notes || '';
+
+      const weather = document.createElement('div');
+      weather.className = 'trip-weather';
+      weather.textContent = data.weather ? `天氣：${data.weather}` : '';
+
+      const tagRow = document.createElement('div');
+      tagRow.className = 'trip-tag-row';
+
+      if (data.food) {
+        const pillFood = document.createElement('span');
+        pillFood.className = 'pill';
+        pillFood.textContent = `🍽 ${data.food}`;
+        tagRow.appendChild(pillFood);
+      }
+
+      if (data.cost) {
+        const pillCost = document.createElement('span');
+        pillCost.className = 'pill';
+        pillCost.textContent = `💰 約 ${data.cost}`;
+        tagRow.appendChild(pillCost);
+      }
+
+      if (data.photoUrl) {
+        const pillPhoto = document.createElement('span');
+        pillPhoto.className = 'pill';
+        pillPhoto.textContent = '🖼 Photo';
+        tagRow.appendChild(pillPhoto);
+      }
+
+      card.appendChild(header);
+      card.appendChild(snippet);
+      card.appendChild(weather);
+      card.appendChild(tagRow);
+
+      // 之後可以在這裡加上點擊事件 → 打開詳情視窗
+      // card.addEventListener('click', () => { ... });
+
+      tripListEl.prepend(card);
+    }
+
+    function renderStars(rating) {
+      const n = parseInt(rating, 10);
+      if (!n || n < 1) return '';
+      return '★'.repeat(n) + '☆'.repeat(5 - n);
+    }
+
+    // ================================
+    // 表單送出：新增冒險卡 & 呼叫 Google Sheet
+    // ================================
+    tripForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(tripForm);
+      const data = {
+        title: formData.get('title') || '',
+        location: formData.get('location') || '',
+        startDate: formData.get('startDate') || '',
+        endDate: formData.get('endDate') || '',
+        food: formData.get('food') || '',
+        cost: formData.get('cost') || '',
+        weather: formData.get('weather') || '',
+        photoUrl: formData.get('photoUrl') || '',
+        rating: formData.get('rating') || '',
+        notes: formData.get('notes') || '',
+        createdAt: new Date().toISOString()
+      };
+
+      // 1. 在前端立即顯示一張新的冒險卡片
+      createTripCard(data);
+
+      // 2. 將資料送到 Google Sheet（Apps Script）
+      //    若尚未設定 GOOGLE_APPS_SCRIPT_URL，這段會因 404 等錯誤而失敗，可暫時忽略。
+      try {
+        // TODO: 替換 GOOGLE_APPS_SCRIPT_URL 後即可開始測試串接
+        const resp = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (!resp.ok) {
+          throw new Error('Network response was not ok');
+        }
+        showToast('✅ 已記錄到航海總帳（Google Sheet）！');
+      } catch (err) {
+        console.warn('寫入 Google Sheet 失敗（可以先略過）：', err);
+        showToast('⚠️ 寫入 Google Sheet 失敗（請稍後設定 Apps Script URL）');
+      }
+
+      tripForm.reset();
+    });
+
+    // ================================
+    // 從 Google Sheet 載入既有紀錄（目前用假資料模擬）
+    // ================================
+    btnLoadFromSheet.addEventListener('click', () => {
+      loadTripsFromSheet();
+    });
+
+    function loadTripsFromSheet() {
+      // TODO: 將來改成 fetch Google Apps Script 回傳 JSON
+      // 目前使用假資料模擬
+      const mockTrips = [
+        {
+          title: '偽桑尼號北海巡航',
+          location: '北方之海',
+          startDate: '2025-01-01',
+          endDate: '2025-01-03',
+          food: '熱紅酒、海鮮濃湯',
+          cost: '22000',
+          weather: '❄️ 雪',
+          photoUrl: '',
+          rating: '4',
+          notes: '雪中的港口特別安靜，適合慢慢散步。'
+        },
+        {
+          title: '香料群島美食大冒險',
+          location: '香料群島',
+          startDate: '2025-02-10',
+          endDate: '2025-02-14',
+          food: '咖哩、烤海魚',
+          cost: '18000',
+          weather: '☀️ 晴',
+          photoUrl: '',
+          rating: '5',
+          notes: '每天都吃到不同的咖哩，味蕾大滿足。'
+        }
+      ];
+
+      mockTrips.forEach(createTripCard);
+      showToast('📜 已載入假資料（之後可改為讀取 Google Sheet）');
+    }
+
+    // ================================
+    // 行程規劃器：生成基礎 Day 卡
+    // ================================
+    function initDays(daysCount = 3) {
+      daysColumn.innerHTML = '';
+      for (let i = 1; i <= daysCount; i++) {
+        const dayCard = document.createElement('div');
+        dayCard.className = 'day-card';
+        dayCard.dataset.day = i;
+
+        const header = document.createElement('div');
+        header.className = 'day-header';
+        header.innerHTML = `
+          <span>Day ${i}</span>
+          <span class="hint">拖拉行程卡片排序</span>
+        `;
+
+        const itemsContainer = document.createElement('div');
+        itemsContainer.className = 'plan-items';
+        itemsContainer.dataset.day = i;
+
+        // drop 事件
+        itemsContainer.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          itemsContainer.classList.add('drag-over');
+        });
+        itemsContainer.addEventListener('dragleave', () => {
+          itemsContainer.classList.remove('drag-over');
+        });
+        itemsContainer.addEventListener('drop', (e) => {
+          e.preventDefault();
+          itemsContainer.classList.remove('drag-over');
+          const id = e.dataTransfer.getData('text/plain');
+          const dragged = document.getElementById(id);
+          if (dragged) {
+            itemsContainer.appendChild(dragged);
+            updatePreviewFromPlanner();
+          }
+        });
+
+        dayCard.appendChild(header);
+        dayCard.appendChild(itemsContainer);
+        daysColumn.appendChild(dayCard);
+      }
+    }
+
+    // 產生行程項目
+    let planItemIdCounter = 1;
+    function createPlanItem(text) {
+      const item = document.createElement('div');
+      const id = 'plan-item-' + (planItemIdCounter++);
+      item.id = id;
+      item.className = 'plan-item';
+      item.textContent = text;
+      item.draggable = true;
+
+      item.addEventListener('dragstart', (e) => {
+        item.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', id);
+      });
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+      });
+
+      return item;
+    }
+
+    // 更新預覽表格
+    function updatePreviewFromPlanner() {
+      previewTableBody.innerHTML = '';
+      const dayCards = daysColumn.querySelectorAll('.day-card');
+      dayCards.forEach((dayCard) => {
+        const day = dayCard.dataset.day;
+        const items = Array.from(dayCard.querySelectorAll('.plan-item')).map(el => el.textContent);
+        const row = document.createElement('tr');
+        const itemsText = items.join(' → ') || '(尚未安排)';
+        row.innerHTML = `
+          <td>Day ${day}</td>
+          <td>${itemsText}</td>
+          <td></td>
+        `;
+        previewTableBody.appendChild(row);
+      });
+    }
+
+    // AI 按鈕：用假資料填入
+    btnAiPlan.addEventListener('click', () => {
+      initDays(MOCK_AI_PLAN.days.length);
+      MOCK_AI_PLAN.days.forEach((dayPlan) => {
+        const itemsContainer = daysColumn.querySelector(`.plan-items[data-day="${dayPlan.day}"]`);
+        if (!itemsContainer) return;
+        dayPlan.items.forEach((txt) => {
+          itemsContainer.appendChild(createPlanItem(txt));
+        });
+      });
+      updatePreviewFromPlanner();
+      showToast('✨ 已使用假資料生成 3 天建議行程（可拖拉排序）');
+    });
+
+    // 初始化：預設產生空的 3 天行程
+    initDays(3);
+    updatePreviewFromPlanner();
+
+    // 版本切換（目前只視覺切換，尚未做多版本資料）
+    document.querySelectorAll('.version-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.version-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        // TODO: 在這裡加入不同版本行程的載入/儲存邏輯
+        showToast(`🧭 切換到行程版本：${pill.dataset.version}`);
+      });
+    });
+
+    // ================================
+    // TODO：Service Worker（PWA 強化）
+    // ================================
+    // 將來可在這裡註冊 service worker，提供離線使用與快取功能。
+    // if ('serviceWorker' in navigator) {
+    //   navigator.serviceWorker.register('/sw.js');
+    // }
+  </script>
+</body>
+</html>
